@@ -16,10 +16,13 @@ class dopassenger (
   if ! defined(Package['gcc-c++']) {
     package { 'gcc-c++' : ensure => 'installed', }
   }
+  if ! defined(Package['ruby-devel']) {
+    package { 'ruby-devel' : ensure => 'installed', }
+  }
   # package doesn't seem to exist
-  #if ! defined(Package['curl-devel']) {
-  #  package { 'curl-devel' : ensure => 'installed', }
-  #}
+  if ! defined(Package['libcurl-devel']) {
+    package { 'libcurl-devel' : ensure => 'installed', }
+  }
   if ! defined(Package['httpd-devel']) {
     package { 'httpd-devel' : ensure => 'installed', }
   }
@@ -35,7 +38,7 @@ class dopassenger (
     package { 'passenger' :
       ensure => 'installed',
       provider => 'gem',
-      require => [Package['gcc-c++'], Package['httpd-devel'], Package['apr-devel'], Package['apr-util-devel ']],
+      require => [Package['gcc-c++'], Package['ruby-devel'], Package['libcurl-devel'], Package['httpd-devel'], Package['apr-devel'], Package['apr-util-devel ']],
     }
   }
   
