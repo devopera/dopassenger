@@ -4,13 +4,13 @@ class dopassenger (
   # ---------------
   # setup defaults
 
-  $passenger_gems_path = '/usr/lib/ruby/gems/1.8/gems',
+  $passenger_gems_path = $dopassenger::params::passenger_gems_path,
 
   # end of class arguments
   # ----------------------
   # begin class
 
-) {
+) inherits dopassenger::params {
 
   # install passenger deps
   case $operatingsystem {
