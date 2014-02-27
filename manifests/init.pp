@@ -4,10 +4,7 @@ class dopassenger (
   # ---------------
   # setup defaults
 
-  $user = 'web',
-  $group = 'www-data',
-
-  $passenger-gems-path = '/usr/lib/ruby/gems/1.8/gems',
+  $passenger_gems_path = '/usr/lib/ruby/gems/1.8/gems',
 
   # end of class arguments
   # ----------------------
@@ -19,9 +16,10 @@ class dopassenger (
   if ! defined(Package['gcc-c++']) {
     package { 'gcc-c++' : ensure => 'installed', }
   }
-  if ! defined(Package['curl-devel']) {
-    package { 'curl-devel' : ensure => 'installed', }
-  }
+  # package doesn't seem to exist
+  #if ! defined(Package['curl-devel']) {
+  #  package { 'curl-devel' : ensure => 'installed', }
+  #}
   if ! defined(Package['httpd-devel']) {
     package { 'httpd-devel' : ensure => 'installed', }
   }
@@ -37,7 +35,7 @@ class dopassenger (
     package { 'passenger' :
       ensure => 'installed',
       provider => 'gem',
-      require => [Package['gcc-c++'], Package['curl-devel'], Package['httpd-devel'], Package['apr-devel'], Package['apr-util-devel ']],
+      require => [Package['gcc-c++'], Package['httpd-devel'], Package['apr-devel'], Package['apr-util-devel ']],
     }
   }
   
@@ -51,7 +49,7 @@ class dopassenger (
   # create symlink 'latest-passenger' for vhost configs
   exec { 'dopassenger-apache2-symlink-latest' :
     path => '/bin:/usr/bin:/sbin:/usr/sbin',
-    command => "find ${passenger-gems-path}/ -name 'passenger-*' --exec ln -s {} ${passenger-gems-path}/latest-passenger \;",
+    command => "find ${passenger_gems_path}/ -name 'passenger-*' -exec ln -s {} ${passenger_gems_path}/latest-passenger \;",
     require => [Package['passenger']],
   }
 
