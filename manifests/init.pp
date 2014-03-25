@@ -123,4 +123,13 @@ class dopassenger (
     command => "find ${passenger_gems_path}/ -name 'passenger-*' -exec ln -s {} ${passenger_gems_path}/latest-passenger \;",
   }
 
+  # selinux
+  if (str2bool($::selinux)) {
+    docommon::setcontext { 'dopassenger-selinux-gem-context' :
+      filename => "${passenger_gems_path}/latest-passenger",
+      context => 'httpd_sys_content_t',
+      require => Exec['dopassenger-apache2-symlink-latest'],
+    }
+  }
+
 }
