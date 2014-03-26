@@ -4,7 +4,10 @@ class dopassenger (
   # ---------------
   # setup defaults
 
+  $user = 'web',
+  $group = 'www-data',
   $passenger_gems_path = $dopassenger::params::passenger_gems_path,
+  $tmp_dir = '/tmp/passenger',
 
   # end of class arguments
   # ----------------------
@@ -125,11 +128,24 @@ class dopassenger (
 
   # selinux
   if (str2bool($::selinux)) {
+    # allow access to gems
     docommon::setcontext { 'dopassenger-selinux-gem-context' :
       filename => "${passenger_gems_path}/latest-passenger",
       context => 'httpd_sys_content_t',
       require => Exec['dopassenger-apache2-symlink-latest'],
     }
+  }
+  # create a writeable temporary directory
+  docommon::stickydir { 'dopassenger-tmpdir' :
+    filename => $tmp_dir,
+    user => 'apache',
+    group => $group,
+    mode => 2660,
+    dirmode => 2770,
+    groupfacl => 'rwx',
+    recurse => true,
+    # httpd_tmpfs_t allows some special privileges, like ability to create socket files
+    context => 'httpd_tmpfs_t',
   }
 
 }
