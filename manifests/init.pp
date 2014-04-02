@@ -120,8 +120,15 @@ class dopassenger (
     creates => "${passenger_gems_path}/latest-passenger",
   }->
 
+  # create symlink 'latest-gems' for vhost configs
+  exec { 'dopassenger-apache2-symlink-latest-gems' :
+    path => '/bin:/usr/bin:/sbin:/usr/sbin',
+    command => "ln -s ${passenger_gems_path} /usr/lib/ruby/latest-gems",
+  }->
+
   # create symlink 'latest-passenger' for vhost configs
-  exec { 'dopassenger-apache2-symlink-latest' :
+  # together these two symlinks give us a cross-platform /usr/lib/ruby/latest-gems/latest-passenger/mod_passenger.so
+  exec { 'dopassenger-apache2-symlink-latest-passenger' :
     path => '/bin:/usr/bin:/sbin:/usr/sbin',
     command => "find ${passenger_gems_path}/ -name 'passenger-*' -exec ln -s {} ${passenger_gems_path}/latest-passenger \;",
   }
@@ -132,13 +139,13 @@ class dopassenger (
     docommon::setcontext { 'dopassenger-selinux-gem-context' :
       filename => "${passenger_gems_path}/latest-passenger",
       context => 'httpd_sys_content_t',
-      require => Exec['dopassenger-apache2-symlink-latest'],
+      require => Exec['dopassenger-apache2-symlink-latest-passenger'],
     }
   }
   # create a writeable temporary directory
   docommon::stickydir { 'dopassenger-tmpdir' :
     filename => $tmp_dir,
-    user => 'apache',
+    user => $::apache::params::user,
     group => $group,
     mode => 2660,
     dirmode => 2770,
