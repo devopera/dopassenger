@@ -123,14 +123,14 @@ class dopassenger (
   # create symlink 'latest-gems' for vhost configs
   exec { 'dopassenger-apache2-symlink-latest-gems' :
     path => '/bin:/usr/bin:/sbin:/usr/sbin',
-    command => "ln -s ${passenger_gems_path} /usr/lib/ruby/latest-gems",
+    command => "ln -fs ${passenger_gems_path} /usr/lib/ruby/latest-gems",
   }->
 
   # create symlink 'latest-passenger' for vhost configs
   # together these two symlinks give us a cross-platform /usr/lib/ruby/latest-gems/latest-passenger/mod_passenger.so
   exec { 'dopassenger-apache2-symlink-latest-passenger' :
     path => '/bin:/usr/bin:/sbin:/usr/sbin',
-    command => "find ${passenger_gems_path}/ -name 'passenger-*' -exec ln -s {} ${passenger_gems_path}/latest-passenger \;",
+    command => "find ${passenger_gems_path}/ -name 'passenger-*' -exec ln -fs {} ${passenger_gems_path}/latest-passenger \;",
   }
 
   # selinux
